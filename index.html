@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scarydise — Visual Artist</title>
+
+<!-- Gak ada apa apa disini bos cari apa -->
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+body {
+  font-family: 'IBM Plex Sans', sans-serif;
+  background: #0a0a0a;
+  color: #e0e0e0;
+  overflow-x: hidden;
+}
+
+h1,h2,h3 { letter-spacing: 1px; font-weight: 600; }
+.text-secondary { color: #888 !important; }
+.section-border { border-top: 1px solid #1a1a1a; }
+.content { position: relative; z-index: 5; }
+
+/* --- SIGIL --- */
+.sigil-bg {
+  position: fixed;
+  inset: 0;
+  background-image: url("assets/logo-bg.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 95vmax;
+  pointer-events: none;
+  z-index: 0;
+  animation: sigilGlow 12s ease-in-out infinite;
+  will-change: opacity;
+}
+
+/* --- SOFT GLOW ANIMATION --- */
+@keyframes sigilGlow {
+  0%   { opacity: 0.16; }
+  45%  { opacity: 0.26; }
+  70%  { opacity: 0.30; }
+  100% { opacity: 0.16; }
+}
+
+/* --- NOISE --- */
+.noise {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  z-index: 4;
+}
+
+/* --- GLASS --- */
+.glass-panel {
+  background: rgba(12,12,12,0.95);
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 2.5rem;
+  border-radius: 8px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.65);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+.glass-panel:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 50px rgba(0,0,0,0.8);
+}
+
+/* --- IMAGE FRAME --- */
+.image-frame {
+  background: #0f0f0f;
+  border: 1px solid #222;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 10px 35px rgba(0,0,0,0.7);
+}
+
+.image-frame img {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  border-radius: 6px;
+  transition: transform 0.3s ease;
+}
+
+.image-frame img:hover {
+  transform: scale(1.02);
+}
+
+/* --- OVERLAP --- */
+.overlap-left .glass-panel { margin-right: -50px; }
+.overlap-right .glass-panel { margin-left: -50px; }
+
+@media(max-width:768px){
+  .overlap-left .glass-panel,
+  .overlap-right .glass-panel { margin: 0; }
+}
+
+/* ===== REVEAL + PARALLAX ===== */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 1s ease, transform 1s ease;
+  will-change: transform, opacity;
+}
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===== WORK SLIDER ===== */
+.works-track {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding-bottom: 12px;
+}
+
+.work-item { min-width: 240px; }
+
+.slider-nav {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.slider-btn {
+  background: #111;
+  border: 1px solid #333;
+  color: #aaa;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.slider-btn:hover {
+  color: #fff;
+  border-color: #666;
+}
+
+/* HERO TEXT ENHANCEMENT - Subtle Dark Aesthetic */
+.hero-textbox h1 {
+  font-size: 4rem;       /* Besar dan dramatis */
+  font-weight: 700;
+  color: #f5f5f5;        /* Putih lembut */
+  text-shadow: 0 2px 8px rgba(0,0,0,0.6); /* Shadow tipis untuk depth */
+  line-height: 1.1;
+}
+
+.hero-textbox p {
+  font-size: 1.5rem;     
+  color: #ccc;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  margin-top: 0.8rem;
+}
+
+/* Animasi ringan */
+.hero-textbox {
+  transform: scale(0.95);
+  opacity: 0;
+  animation: heroPop 1.2s ease forwards;
+}
+
+@keyframes heroPop {
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* ===== ABOUT IMAGE BOX ===== */
+.about-text, .about-image {
+  border-radius: 8px;
+}
+
+/* ===== CONTACT BOX ===== */
+.contact-box {
+  background: rgba(20,20,20,0.85);
+  display: inline-block;
+  padding: 1.2rem 2rem;
+  margin-bottom: 1rem;
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+}
+
+/* ===== USP / OPPORTUNITIES (GOTH STYLE) ===== */
+.goth-list li {
+  margin-bottom: 10px;
+  line-height: 1.5;
+  border-left: 2px solid #6600cc;
+  padding-left: 10px;
+  font-style: italic;
+  color: #bbb;
+}
+.goth-list li::marker { color: #6600cc; }
+
+/* ===== COPYRIGHT ===== */
+footer {
+  font-size: 0.9rem;
+  letter-spacing: 0.8px;
+  color: #aaa;
+}
+</style>
+</head>
+
+<body>
+
+<div class="sigil-bg"></div>
+<div class="noise"></div>
+
+<div class="content">
+
+<!-- HERO -->
+<section class="vh-100 d-flex align-items-center justify-content-center text-center">
+  <div class="hero-textbox">
+    <h1 class="display-5 mb-3">SCARYDISE</h1>
+    <p class="text-secondary">Visual Artist — Illustration — Tattoo Practice</p>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="container py-5 section-border reveal fade-left">
+  <div class="row align-items-center g-5">
+    <div class="col-md-6">
+      <div class="glass-panel about-text">
+        <h2>About</h2>
+        <p class="text-secondary fs-6">
+          Hallo!! Saya Febriado Setya Kerian, saya memiliki pribadi yang
+          mudah bergaul dan fleksibel secara sosial dan bisa menjadi
+          introvert maupun ekstrovert, tergantung pada situasi dan
+          lingkungan sekitar. Saya memiliki minat besar dalam dunia seni
+          dan kreativitas, terutama dalam mendengarkan musik,
+          menggambar, dan berkendara dengan motor, yang sering kali
+          menjadi inspirasi dalam karya-karya saya.
+          Karena saya ingin terjun ke dunia tatto, melalui karya dan
+          perjalanan saya, saya ingin berkontribusi dalam mengubah
+          stigma negatif masyarakat terhadap seni tato. Bagi saya, tato
+          bukan hanya sekadar gambar di kulit, melainkan bentuk ekspresi
+          diri dan cerita personal yang layak dihargai.
+        </p>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="glass-panel image-frame about-image">
+        <img src="assets/foto.jpeg">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STRENGTH -->
+<section class="container py-5 section-border reveal fade-right">
+  <div class="row align-items-center g-5 flex-md-row-reverse">
+    <div class="col-md-6">
+      <div class="glass-panel">
+        <h2>Strength</h2>
+        <ul class="text-secondary goth-list">
+          <li>Ilustrasi jadi keahlian utama, dengan gaya yang bisa disesuaikan kebutuhan visual.</li>
+          <li>Punya pengalaman di proyek nyata seperti desain produk, bikin mural, dan ikut pameran ilustrasi</li>
+          <li>Bisa kerja lintas media visual, dari karya cetak sampai tampilan ruang publik</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- USP -->
+<section class="container py-5 section-border reveal fade-left">
+  <div class="row align-items-center g-5">
+    <div class="col-md-6">
+      <div class="glass-panel">
+        <h2>USP</h2>
+        <ul class="text-secondary goth-list">
+          <li>Menggabungkan narasi visual dengan desain fungsional</li>
+          <li>Karya estetis yang juga berdaya guna di berbagai medium</li>
+          <li>Pengalaman lintas proyek dari produk hingga pameran visual</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OPPORTUNITIES -->
+<section class="container py-5 section-border reveal fade-right">
+  <div class="row align-items-center g-5 flex-md-row-reverse">
+    <div class="col-md-6">
+      <div class="glass-panel">
+        <h2>Opportunities</h2>
+        <ul class="text-secondary goth-list">
+          <li>Banyak brand & proyek kreatif mencari ilustrator untuk memperkuat identitas visual.</li>
+          <li>Kebutuhan konten visual di media sosial & industri kreatif makin tinggi.</li>
+          <li>Ekspansi ke industri kreatif digital dan produk lokal untuk kolaborasi unik.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WORKS -->
+<section class="container py-5 section-border reveal fade-up">
+  <h2 class="mb-4">Selected Works</h2>
+
+  <h4>Logo</h4>
+  <div class="slider-nav">
+    <button class="slider-btn" onclick="slide('logo',-260)">‹</button>
+    <button class="slider-btn" onclick="slide('logo',260)">›</button>
+  </div>
+  <div class="works-track" id="logo">
+    <div class="work-item image-frame"><img src="assets/HctlG2 preview_23-02-23_ (1).jpg"></div>
+    <div class="work-item image-frame"><img src="assets/Hctl 1 preview._23-02-21_.jpg"></div>
+    <div class="work-item image-frame"><img src="assets/Tak berjudul48_20230806011655.png"></div>
+    <div class="work-item image-frame"><img src="assets/Tak berjudul49_20230809214254.png"></div>
+    <div class="work-item image-frame"><img src="assets/Tak berjudul4_20240221213034 (1).png"></div>
+
+  </div>
+
+  <h4 class="mt-5">Visual Design</h4>
+  <div class="slider-nav">
+    <button class="slider-btn" onclick="slide('visual',-260)">‹</button>
+    <button class="slider-btn" onclick="slide('visual',260)">›</button>
+  </div>
+  <div class="works-track" id="visual">
+    <div class="work-item image-frame"><img src="assets/visual (1).png"></div>
+    <div class="work-item image-frame"><img src="assets/visual (2).png"></div>
+    <div class="work-item image-frame"><img src="assets/visual (3).png"></div>
+    <div class="work-item image-frame"><img src="assets/visual (4).png"></div>
+    <div class="work-item image-frame"><img src="assets/visual (5).png"></div>
+    <div class="work-item image-frame"><img src="assets/visual (6).png"></div>
+    <div class="work-item image-frame"><img src="assets/visual (7).png"></div>
+  </div>
+
+  <h4 class="mt-5">Illustration</h4>
+  <div class="slider-nav">
+    <button class="slider-btn" onclick="slide('illus',-260)">‹</button>
+    <button class="slider-btn" onclick="slide('illus',260)">›</button>
+  </div>
+  <div class="works-track" id="illus">
+    <div class="work-item image-frame"><img src="assets/illust (1).jpg"></div>
+    <div class="work-item image-frame"><img src="assets/illust (1).png"></div>
+    <div class="work-item image-frame"><img src="assets/illust (2).JPG"></div>
+    <div class="work-item image-frame"><img src="assets/illust (2).png"></div>
+    <div class="work-item image-frame"><img src="assets/illust (3).JPG"></div>
+    <div class="work-item image-frame"><img src="assets/illust (3).png"></div>
+    <div class="work-item image-frame"><img src="assets/illust (4).jpg"></div>
+    <div class="work-item image-frame"><img src="assets/illust (4).png"></div>
+    <div class="work-item image-frame"><img src="assets/illust (5).jpg"></div>
+    <div class="work-item image-frame"><img src="assets/illust (6).jpg"></div>
+    <div class="work-item image-frame"><img src="assets/illust (7).jpg"></div>
+    <div class="work-item image-frame"><img src="assets/illust (8).jpg"></div>
+    <div class="work-item image-frame"><img src="assets/illust (9).jpg"></div>
+  </div>
+</section>
+<!-- IMAGE POPUP / LIGHTBOX -->
+  <div id="lightbox" class="d-none position-fixed top-0 start-0 w-100 h-100" 
+     style="background: rgba(0,0,0,0.9); display:flex; align-items:center; justify-content:center; z-index:9999;">
+    <img id="lightbox-img" src="" style="max-width:90%; max-height:90%; border-radius:8px; box-shadow:0 8px 40px rgba(0,0,0,0.8);">
+  </div>
+
+
+<!-- CONTACT -->
+<section class="container py-5 section-border text-center reveal fade-up">
+  <h2>Contact</h2>
+  <div class="contact-box">
+    <p>Email: febriadosetya@gmail.com</p>
+    <p>Phone: +62 852-4484-1551</p>
+  </div>
+  <div class="d-flex justify-content-center gap-4 mt-3">
+    <a href="https://instagram.com/scarydise__" target="_blank">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg" width="40">
+    </a>
+    <a href="https://wa.me/6285244841551" target="_blank">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="40">
+    </a>
+  </div>
+</div>
+
+</section>
+
+<footer class="text-center py-4">
+© 2026 Febriado Setya Kerian — All rights reserved.
+</footer>
+
+</div>
+
+<script>
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver(entries=>{
+ entries.forEach(entry=>{
+   if(entry.isIntersecting){
+     entry.target.classList.add('active');
+   } else {
+     entry.target.classList.remove('active');
+   }
+ });
+},{threshold:0.15});
+
+reveals.forEach(r=>observer.observe(r));
+
+window.addEventListener('scroll', ()=>{
+ document.querySelectorAll('.parallax').forEach(el=>{
+   let offset = window.scrollY * 0.12;
+   el.style.setProperty('--parallax', offset + 'px');
+ });
+});
+
+function slide(id, amount){
+ document.getElementById(id).scrollBy({left:amount, behavior:'smooth'});
+}
+
+// Lightbox untuk selected works
+document.querySelectorAll('.works-track .work-item img').forEach(img => {
+  img.style.cursor = 'pointer'; // biar keliatan clickable
+  img.addEventListener('click', ()=>{
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    lightboxImg.src = img.src;
+    lightbox.classList.remove('d-none');
+  });
+});
+
+document.getElementById('lightbox').addEventListener('click', ()=>{
+  document.getElementById('lightbox').classList.add('d-none');
+});
+
+</script>
+
+</body>
+</html>
